@@ -1,0 +1,237 @@
+@model BlognaCorev2.Models.PageListViewModel<BlognaCorev2.Models.Post>
+
+@{
+    ViewData["Title"] = "Gönderilerim";
+    Layout = "_Layout"; 
+}
+
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="mb-4 p-4 rounded-lg bg-red-100 text-red-800 font-medium">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-4xl font-extrabold text-indigo-400">
+            <i class="fas fa-file-alt mr-2 text-indigo-500"></i> Gönderilerim
+        </h1>
+        <form method="get" asp-controller="Posts" asp-action="MyPosts" class="flex items-center w-full md:w-1/2 transition">
+            <!-- Modern arama çubuğu -->
+            <div class="relative flex-grow max-w-md"> 
+                <input type="text" name="SearchTerm" placeholder="Gönderilerde ara..."
+                       value="@Model.Query"
+                       class="w-full px-4 py-2 rounded-lg bg-gray-800 text-gray-200 border border-gray-700
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                              placeholder-gray-500 transition" />
+                <span class="absolute right-3 top-2.5 text-gray-400 pointer-events-none">🔍</span>
+            </div>
+
+            <!-- Dinamik PageSize Select Kutusu -->
+            <select name="PageSize" class="ml-3 px-4 py-2 rounded-lg bg-gray-800 text-gray-200 border border-gray-700
+                                         focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                         placeholder-gray-500 transition">
+                @foreach (var size in Model.AvailableSizes)
+                {
+                    <option value="@size" selected="@(size == Model.PageSize)">
+                        @size
+                    </option>
+                }
+            </select>
+
+            <button type="submit" class="ml-3 px-5 py-2 rounded-lg bg-indigo-600 text-white
+                                        hover:bg-indigo-700 active:bg-indigo-800 transition transform hover:scale-105">
+                Ara
+            </button>
+        </form>
+
+        <a asp-controller="Posts" asp-action="Create" class="flex items-center bg-indigo-600 text-white font-semibold py-2 px-4 rounded-xl shadow-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105">
+            <i class="fas fa-plus mr-2"></i> Yeni Gönderi
+        </a>
+    </div>
+
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        @* Yayınlananlar (solda) *@
+        <div>
+            
+            <h2 class="text-2xl font-extrabold text-indigo-300 mb-3 cursor-pointer select-none lg:cursor-auto"
+                onclick="if(window.innerWidth < 1024) toggleSection('publishedSection')">
+                Yayında Olanlar
+            </h2>
+            <div id="publishedSection" class="transition-all duration-500 ease-in-out lg:block" style="display:block;">
+                @foreach (var post in Model.Items.Where(p => p.Ispublished))
+                {
+                    <div class="bg-white p-6 rounded-2xl shadow-xl mb-4 border border-gray-100 relative">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold text-gray-900">@post.Title</h3>
+                                <p class="text-gray-700 mt-2">
+                                    @(post.Content.Length > 200 ? post.Content.Substring(0, 200) + "..." : post.Content)
+                                </p>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Oluşturulma: <span class="font-medium text-gray-600">@(post.CreatedAt).ToString("dd MMMM yyyy")</span>
+                                </p>
+                            </div>
+
+                            <div class="flex items-center space-x-3 ml-4">
+                                <!-- TOGGLE BUTTON (Eski tasarım) -->
+                                <a asp-controller="Posts" asp-action="TogglePublishedAction" asp-route-id="@post.Id"
+                                   class="relative w-14 h-8 bg-gray-200 rounded-full flex items-center px-1 cursor-pointer transition-all duration-300">
+
+                                    <div class="absolute top-1 w-6 h-6 flex items-center justify-center text-gray-700 opacity-80
+                                                transition-all duration-300
+                                                @(post.Ispublished ? "right-1" : "left-1")">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+
+                                    <div class="absolute top-1 w-6 h-6 rounded-full shadow-md transition-all duration-300
+                                                @(post.Ispublished ? "left-1 bg-green-500" : "right-1 bg-yellow-500")">
+                                    </div>
+                                </a>
+
+                                <!-- EDIT -->
+                                <a asp-controller="Posts" asp-action="Edit" asp-route-id="@post.Id" class="w-10 h-10 flex items-center justify-center text-indigo-600 hover:text-indigo-800 rounded-full hover:bg-indigo-50 transition duration-150" title="Düzenle">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <!-- DELETE -->
+                                <form asp-controller="Posts" asp-action="Delete" asp-route-id="@post.Id" method="post" onsubmit="return confirm('Bu gönderiyi silmek istediğinizden emin misiniz?');">
+                                    <button type="submit" class="w-10 h-10 flex items-center justify-center text-red-600 hover:text-red-800 rounded-full hover:bg-red-50 transition duration-150" title="Sil">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* Taslaklar (sağda) *@
+        <div>
+            <h2 class="text-2xl font-extrabold text-indigo-300 mb-3 cursor-pointer select-none lg:cursor-auto"
+                onclick="if(window.innerWidth < 1024) toggleSection('draftSection')">
+                Taslaklar
+            </h2>
+            <div id="draftSection" class="transition-all duration-500 ease-in-out lg:block" style="display:block;">
+                @foreach (var post in Model.Items.Where(p => !p.Ispublished))
+                {
+                    <div class="bg-white p-6 rounded-2xl shadow-xl mb-4 border border-gray-100 relative">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold text-gray-900">@post.Title</h3>
+                                <p class="text-gray-700 mt-2">
+                                    @(post.Content.Length > 200 ? post.Content.Substring(0, 200) + "..." : post.Content)
+                                </p>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    Oluşturulma: <span class="font-medium text-gray-600">@(post.CreatedAt)ToString("dd MMMM yyyy")</span>
+                                </p>
+                            </div>
+
+                            <div class="flex items-center space-x-3 ml-4">
+                                <!-- TOGGLE BUTTON -->
+                                <a asp-controller="Posts" asp-action="TogglePublishedAction" asp-route-id="@post.Id"
+                                   class="relative w-14 h-8 bg-gray-200 rounded-full flex items-center px-1 cursor-pointer transition-all duration-300">
+
+                                    <div class="absolute top-1 w-6 h-6 flex items-center justify-center text-gray-700 opacity-80
+                                                transition-all duration-300
+                                                @(post.Ispublished ? "right-1" : "left-1")">
+                                        <i class="fas fa-check"></i>
+                                    </div>
+
+                                    <div class="absolute top-1 w-6 h-6 rounded-full shadow-md transition-all duration-300
+                                                @(post.Ispublished ? "left-1 bg-green-500" : "right-1 bg-yellow-500")">
+                                    </div>
+                                </a>
+
+                                <!-- EDIT -->
+                                <a asp-controller="Posts" asp-action="Edit" asp-route-id="@post.Id" class="w-10 h-10 flex items-center justify-center text-indigo-600 hover:text-indigo-800 rounded-full hover:bg-indigo-50 transition duration-150" title="Düzenle">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+
+                                <!-- DELETE -->
+                                <form asp-controller="Posts" asp-action="Delete" asp-route-id="@post.Id" method="post" onsubmit="return confirm('Bu gönderiyi silmek istediğinizden emin misiniz?');">
+                                    <button type="submit" class="w-10 h-10 flex items-center justify-center text-red-600 hover:text-red-800 rounded-full hover:bg-red-50 transition duration-150" title="Sil">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+    <!-- Paging -->
+    <div class="flex justify-center mt-8 gap-2">
+        @if (Model.HasPreviousPage)
+        {
+            <a asp-controller="Posts" asp-action="MyPosts" asp-route-PageIndex="@(Model.CurrentPage-1)"
+               asp-route-PageSize="@Model.PageSize" asp-route-SearchTerm="@Model.Query"
+               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">← Önceki</a>
+        }
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <a asp-controller="Posts" asp-action="MyPosts" asp-route-PageIndex="@i"
+               asp-route-PageSize="@Model.PageSize" asp-route-SearchTerm="@Model.Query"
+               class="px-4 py-2 rounded-lg hover:bg-indigo-700 transition
+                  @(i==Model.CurrentPage ? "bg-indigo-800 text-white" : "bg-indigo-600 text-white")">
+                @i
+            </a>
+        }
+
+        @if (Model.HasNextPage)
+        {
+            <a asp-controller="Posts" asp-action="MyPosts" asp-route-PageIndex="@(Model.CurrentPage+1)"
+               asp-route-PageSize="@Model.PageSize" asp-route-SearchTerm="@Model.Query"
+               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Sonraki →</a>
+        }
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // Sayfa yüklendiğinde başlangıç durumunu ayarla
+        function setInitialVisibility() {
+            if (window.innerWidth < 1024) {
+                // Mobilde bölümler başlangıçta gizli olacak
+                document.getElementById('publishedSection').style.display = 'none';
+                document.getElementById('draftSection').style.display = 'none';
+            } else {
+                // Desktopta her zaman açık olacak
+                document.getElementById('publishedSection').style.display = 'block';
+                document.getElementById('draftSection').style.display = 'block';
+            }
+        }
+
+        // Bölüm aç / kapat (mobil)
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                if (section.style.display === 'none' || section.style.display === '') {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            }
+        }
+
+        // Ekran boyutu değiştiğinde her şeyin doğru şekilde görünmesini sağla
+        window.addEventListener('resize', () => {
+            setInitialVisibility();
+        });
+    
+        // Sayfa yüklendiğinde başlangıç durumunu ayarla
+        window.addEventListener('load', () => {
+            setInitialVisibility();
+        });
+    </script>
+}

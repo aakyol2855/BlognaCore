@@ -1,0 +1,35 @@
+@using System.Security.Claims
+@model BlognaCorev2.Models.Post
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container mx-auto max-w-4xl py-8">
+    <article class="bg-white shadow-2xl rounded-xl p-8 transition duration-300 border-t-4 border-indigo-600">
+        <!-- Başlık: Beyaz arka planda en yüksek kontrast için siyah -->
+        <h1 class="text-4xl font-extrabold mb-3 text-gray-900 leading-tight">@Model.Title</h1>
+        
+        <!-- Meta Bilgileri: Yazar ve Tarih -->
+        <div class="text-sm mb-6 pb-4 border-b border-gray-100 text-gray-500">
+            <!-- Yazar Alanı -->
+            <span class="font-medium text-gray-600 mr-4">
+                <i class="fas fa-user-edit mr-1 text-indigo-500"></i> Yazar: @Model.Author
+            </span>
+            
+            <!-- Tarih Alanı -->
+            <span class="text-xs">
+                <i class="fas fa-clock mr-1 text-indigo-500"></i> Güncelleme: @Model.UpdatedAt.ToString("dd MMMM yyyy")
+            </span>
+        </div>
+        
+        <!-- Gönderi İçeriği: Beyaz arka planda koyu gri metin (en iyi okunabilirlik) -->
+        <div class="prose max-w-none text-lg text-gray-800 leading-relaxed space-y-4">
+            @Model.Content
+        </div>
+    </article>
+</div>
+
+@section Scripts {
+    <!-- Font Awesome (ikonlar için) -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+}

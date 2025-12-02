@@ -1,8 +1,129 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model BlognaCorev2.Models.PageListViewModel<BlognaCorev2.Models.Post>
+
+@{
+    ViewData["Title"] = "Gönderiler";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mx-auto mt-12 px-4">
+    <!-- Üst Başlık + Arama -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-10 gap-4">
+        <h1 class="text-3xl font-bold text-gray-100 tracking-tight">
+            Gönderiler
+        </h1>
+        <form method="get" asp-controller="Home" asp-action="Index" class="flex items-center w-full md:w-1/2 transition">
+            <!-- Modern arama çubuğu -->
+            <div class="relative w-full">
+                <input type="text" name="SearchTerm" placeholder="Gönderilerde ara..."
+                       value="@Model.Query"
+                       class="w-full px-4 py-2 rounded-lg bg-gray-800 text-gray-200 border border-gray-700
+                              focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                              placeholder-gray-500 transition" />
+                <span class="absolute right-3 top-2.5 text-gray-400 pointer-events-none">🔍</span>
+            </div>
+
+            <!-- Dinamik PageSize Select Kutusu -->
+            <select name="PageSize" class="ml-3 px-4 py-2 rounded-lg bg-gray-800 text-gray-200 border border-gray-700
+                                         focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                                         placeholder-gray-500 transition">
+                @foreach (var size in Model.AvailableSizes)
+                {
+                    <option value="@size" selected="@(size == Model.PageSize)">
+                        @size
+                    </option>
+                }
+            </select>
+
+            <button type="submit" class="ml-3 px-5 py-2 rounded-lg bg-indigo-600 text-white
+                                        hover:bg-indigo-700 active:bg-indigo-800 transition transform hover:scale-105">
+                Ara
+            </button>
+        </form>
+    </div>
+
+    <!-- Gönderiler Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        @if (Model == null || !Model.Items.Any())
+        {
+            <div class="col-span-full text-gray-300 text-center text-lg py-10">
+                Hiç sonuç bulunamadı 👀
+            </div>
+        }
+        else
+        {
+            foreach (var post in Model.Items)
+            {
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg
+                            hover:shadow-xl hover:border-indigo-600 hover:-translate-y-1
+                            transition-all duration-300 ease-out">
+                    <h2 class="text-2xl font-semibold text-white mb-3 line-clamp-2">
+                        @post.Title
+                    </h2>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-5 line-clamp-4">
+                        @(post.Content?.Length > 500
+                            ? post.Content.Substring(0, 500) + "..."
+                            : post.Content)
+                    </p>
+                    <div class="flex justify-between items-center">
+                        <a asp-controller="Posts"
+                           asp-action="Details"
+                           asp-route-id="@post.Id"
+                           class="text-indigo-400 hover:text-indigo-200 font-medium transition">
+                            Oku →
+                        </a>
+                        <span class="text-gray-500 text-xs">
+                            @post.CreatedAt.ToString("dd MMM yyyy")
+                        </span>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- Paging -->
+    <div class="flex justify-center mt-8">
+        @if (Model.HasPreviousPage)
+        {
+            <a  asp-controller="Home"
+                asp-action="Index"
+                asp-route-PageIndex="1"
+                asp-route-PageSize="@(Model.PageSize)"
+                asp-route-SearchTerm="@(Model.Query)"
+                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
+                İlk Sayfa
+            </a>
+            <a asp-controller="Home"
+               asp-action="Index"
+               asp-route-PageIndex="@(Model.CurrentPage - 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.Query"
+               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                ← Önceki
+            </a>
+        }
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <a asp-controller="Home"
+               asp-action="Index"
+               asp-route-PageIndex="@i"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.Query"
+               class="px-4 py-2 bg-indigo-600 text-white rounded-lg mx-1 hover:bg-indigo-700 @((i == Model.CurrentPage) ? "bg-indigo-800" : "")">
+                @i
+            </a>
+        }
+
+        @if (Model.HasNextPage)
+        {
+            <a asp-controller="Home"
+               asp-action="Index"
+               asp-route-PageIndex="@(Model.CurrentPage + 1)"
+               asp-route-PageSize="@Model.PageSize"
+               asp-route-SearchTerm="@Model.Query"
+               class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                Sonraki →
+            </a>
+        }
+    </div>
 </div>

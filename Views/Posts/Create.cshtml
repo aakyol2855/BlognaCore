@@ -1,0 +1,59 @@
+@model BlognaCorev2.Models.Post
+@{
+    ViewData["Title"] = "Yeni Gönderi Oluştur";
+}
+
+<div class="container mx-auto max-w-2xl py-8">
+    <!-- Ana Başlık -->
+    <h1 class="text-4xl font-extrabold mb-6 text-indigo-400 border-b border-gray-700 pb-2">
+        <i class="fas fa-plus-circle mr-2"></i> Yeni Gönderi Oluştur
+    </h1>
+
+    <!-- Oluşturma Formu -->
+    <form asp-action="Create" method="post" class="bg-gray-800 shadow-2xl rounded-xl p-8 space-y-6 border border-gray-700">
+        
+        <!-- Başlık Alanı -->
+        <div>
+            <label asp-for="Title" class="block mb-2 text-lg font-semibold text-gray-300">Başlık</label>
+            <input asp-for="Title" 
+                   class="w-full border-2 border-gray-600 px-4 py-3 bg-gray-700 text-white rounded-lg transition duration-200 
+                          focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
+                   placeholder="Gönderi başlığını girin..." />
+            <span asp-validation-for="Title" class="text-red-500 text-sm mt-1 block"></span>
+        </div>
+
+        <!-- İçerik Alanı -->
+        <div>
+            <label asp-for="Content" class="block mb-2 text-lg font-semibold text-gray-300">İçerik</label>
+            <textarea asp-for="Content" 
+                      class="w-full border-2 border-gray-600 px-4 py-3 bg-gray-700 text-white rounded-lg h-64 resize-y transition duration-200 
+                             focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
+                      placeholder="Makalenizin tüm içeriği..."></textarea>
+            <span asp-validation-for="Content" class="text-red-500 text-sm mt-1 block"></span>
+        </div>
+        
+        <!-- Yayınlama Onay Kutusu -->
+        <div>
+            <label asp-for="Ispublished" class="inline-flex items-center cursor-pointer p-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition duration-200">
+                <input asp-for="Ispublished" 
+                       type="checkbox" 
+                       class="form-checkbox h-5 w-5 text-indigo-500 border-gray-600 rounded focus:ring-indigo-500" />
+                <span class="ml-3 text-gray-300 font-medium">Bu gönderiyi hemen yayınla</span>
+            </label>
+        </div>
+
+        <!-- İşlem Butonu -->
+        <div class="pt-4 flex justify-end">
+            <button type="submit" asp-action="Create" 
+                    class="flex items-center bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold text-lg 
+                           hover:bg-indigo-700 transition duration-300 transform hover:scale-[1.02] shadow-lg shadow-indigo-500/30">
+                <i class="fas fa-paper-plane mr-2"></i> Oluştur ve Yayınla
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <!-- Font Awesome (ikonlar için) -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+}

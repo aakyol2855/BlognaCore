@@ -1,6 +1,47 @@
+## Build artifacts
 bin/
 obj/
-/packages/
-riderModule.iml
-/_ReSharper.Caches/
-.idea
+
+## User-specific files
+*.user
+*.userosscache
+*.suo
+*.cache
+*.pdb
+*.mdb
+
+## Visual Studio working files
+.vs/
+
+## Rider / IntelliJ / JetBrains
+.idea/
+
+## Logs
+*.log
+
+## Configuration secrets
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+## Publish outputs
+out/
+publish/
+
+## ASP.NET scaffolding temp
+ScaffoldingReadMe.txt
+
+## Package restore data
+packages/
+*.nupkg
+
+## NuGet
+.nuget/
+
+## Temp
+*.tmp
+*.temp
+
+## Other
+Thumbs.db
+*.DS_Store

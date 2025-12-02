@@ -1,0 +1,55 @@
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+<!-- Navigasyon Öğeleri listesi yerine daha esnek bir div yapısı -->
+<div class="flex items-center space-x-3">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <!-- Giriş yapmış kullanıcı için -->
+    
+        <!-- Kullanıcı Adı / Yönetim Sayfası -->
+        <a id="manage" 
+           class="text-indigo-400 hover:text-white transition duration-300 font-semibold p-2 rounded-lg hover:bg-indigo-600/20" 
+           href="/Identity/Account/Manage">
+            Merhaba @UserManager.GetUserName(User)!
+        </a>
+    
+        <!-- Çıkış Formu -->
+        <!-- Formdaki asp-page ve asp-route-returnUrl MVC/Razor Pages uyumluluğu için bırakılabilir, 
+        çünkü Identity'nin bu formu işlemesi özeldir. -->
+        <form id="logoutForm"
+              class="inline"
+              asp-area="Identity"
+              asp-page="/Account/Logout"
+              asp-route-returnUrl='@Url.Action("Index", "Home", new { area = "" })'
+              method="post">
+    
+            @Html.AntiForgeryToken()
+
+            <button id="logout"
+                    type="submit"
+                    class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-xl shadow-md transition duration-200 transform hover:scale-105">
+                Çıkış Yap
+            </button>
+        </form>
+
+    }
+    else
+    {
+        <!-- Kayıt Ol -->
+        <a id="register" 
+           class="text-gray-300 hover:text-white transition duration-300 p-2 rounded-lg hover:bg-indigo-600/20" 
+           href="/Identity/Account/Register">
+            Kayıt Ol
+        </a>
+
+        <!-- Giriş Yap -->
+        <a id="login" 
+           class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-xl shadow-md transition duration-200 transform hover:scale-105" 
+           href="/Identity/Account/Login">
+            Giriş Yap
+        </a>
+    }
+</div>

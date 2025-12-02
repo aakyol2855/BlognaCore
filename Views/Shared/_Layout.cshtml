@@ -3,48 +3,116 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BlognaCorev2</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/BlognaCorev2.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - BlogNa</title>
+
+    <!-- Tailwind CDN (HATALARI GİDERİLDİ) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @@keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-fadeOut { animation: fadeOut 0.3s ease-in forwards; }
+    </style>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BlognaCorev2</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+
+<!-- SUCCESS TOAST -->
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+    <div class="fixed top-16 right-5 z-50">
+        <div id="success-toast"
+             class="flex items-center max-w-sm bg-green-100 border border-green-300 text-green-800
+                    px-4 py-3 rounded-2xl shadow-lg animate-fadeIn" role="alert">
+
+            <svg class="w-6 h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 12l2 2l4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+
+            <span class="flex-grow">@successMessage</span>
+
+            <button type="button"
+                    class="ml-2 text-green-900 hover:text-green-700 font-bold"
+                    onclick="document.getElementById('success-toast').remove()">
+                &times;
+            </button>
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - BlognaCorev2 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <script>
+        setTimeout(() => {
+            const toast = document.getElementById('success-toast');
+            if (toast) {
+                toast.classList.add('animate-fadeOut');
+                setTimeout(() => toast.remove(), 300);
+            }
+        }, 1800);
+    </script>
+}
+
+<!-- NAVBAR -->
+<nav class="bg-gray-800/80 backdrop-blur shadow-xl sticky top-0 z-50 border-b border-gray-700/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+
+            <!-- Logo -->
+            <a asp-controller="Home" asp-action="Index" class="flex-shrink-0">
+                <span class="text-2xl font-extrabold tracking-tight text-indigo-400
+                             hover:text-indigo-300 transition">
+                    BlogNa
+                </span>
+            </a>
+
+            <!-- Navigation -->
+            <div class="hidden sm:flex items-center space-x-4">
+
+                <a asp-controller="Home" asp-action="Index"
+                   class="p-2 rounded-lg text-gray-300 hover:bg-indigo-600/20 hover:text-white transition">
+                    Ana Sayfa
+                </a>
+
+                <a asp-controller="Posts" asp-action="MyPosts"
+                   class="p-2 rounded-lg text-gray-300 hover:bg-indigo-600/20 hover:text-white transition">
+                    Gönderilerim
+                </a>
+            </div>
+
+            <!-- Login partial -->
+            <div class="flex items-center space-x-4">
+                <partial name="_LoginPartial"/>
+            </div>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="flex-grow p-4">
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        @RenderBody()
+    </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="bg-gray-800/80 border-t border-gray-700/50 p-4 text-center text-gray-500 text-sm mt-auto">
+    &copy; @DateTime.Now.Year – BlogNa –
+    <a asp-controller="Home" asp-action="Privacy"
+       class="text-indigo-400 hover:text-indigo-300 transition">
+        Gizlilik
+    </a>
+</footer>
+
+<!-- KALAN GEREKLİ TEK SCRIPT -->
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
